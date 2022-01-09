@@ -9,8 +9,7 @@
 /out
 /dist
 
-# keys
-/neardev
+
 
 # testing
 /coverage
