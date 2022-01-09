@@ -5,14 +5,16 @@ use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::{env, near_bindgen, setup_alloc};
 use near_sdk::collections::Vector;
 use near_sdk::AccountId;
+use near_sdk::serde::{Serialize,Deserialize};
 
 setup_alloc!();
 
+pub type List = Vec<AccountId>;
 
 #[near_bindgen]
-#[derive(BorshDeserialize, BorshSerialize)]
+#[derive(BorshDeserialize, BorshSerialize, Serialize,Deserialize)]
 pub struct OwnerCar {
-    history: Vector<AccountId>,
+    history: List,
     owner_car: AccountId
 }
 
@@ -30,7 +32,7 @@ impl OwnerCar {
         assert!(env::is_valid_account_id(owner.as_bytes()), "Invalid Account Owner");
         Self {
             owner_car:owner,
-            history: Vector::new(b"history".to_vec()),
+            history: Vec::new(),
         }
 
     }
@@ -39,7 +41,7 @@ impl OwnerCar {
         assert!(env::is_valid_account_id(new_owner.as_bytes()), "Invalid account address");
         let account_id = env::signer_account_id();
         assert!(account_id == self.owner_car, "Not owner");
-        self.history.push(&account_id);
+        self.history.push(account_id);
         self.owner_car = new_owner;
     }
 
@@ -51,7 +53,11 @@ impl OwnerCar {
 
     pub fn get_old_owner(&self) -> Vec<String>{
 
-        self.history.iter().collect::<Vec<String>>()
+        let mut res = vec![];
+        for i in self.history.iter(){
+            res.push(i.to_owned());
+        }
+        res
     }
 }
 
